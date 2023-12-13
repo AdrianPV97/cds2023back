@@ -3,6 +3,7 @@ const sharp = require('sharp');
 const express = require('express');
 const fs = require('fs');
 const app = express();
+const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors'); // Importa el middleware cors
 const port = 4000;
@@ -10,6 +11,7 @@ const port = 4000;
 const { connectToDatabase } = require('./drivers/test');
 app.use(express.json({ limit: '10mb' }));
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 const storage = multer.memoryStorage(); // Almacenar archivos en memoria
@@ -50,7 +52,7 @@ app.get('/resumen', async (req,res) =>{
 app.get('/donacion', async (req, res)=>{
   try {
       const connection = await connectToDatabase();
-      const [rows, fields] = await connection.execute('SELECT tipo, grupo, id, evidencia, indice FROM paquete');
+      const [rows, fields] = await connection.execute('SELECT tipo, grupo, id, evidencia, indice, voluntario FROM paquete');
       res.json(rows);
       await connection.end();
     } catch (error) {
@@ -105,6 +107,19 @@ app.get('/paqueteid', async (req, res) =>{
       console.error('Error en el ejemplo de uso:', error);
     }
 
+});
+
+app.get('/image/:name', (req, res) =>{
+  const nombreArchivo = req.params.name;
+  //const nombreArchivo = '';
+  const rutaImagen = path.join(__dirname, 'uploads', nombreArchivo);
+
+  if (fs.existsSync(rutaImagen)) {
+    res.sendFile(rutaImagen);
+  } else {
+    // Manejar caso donde la imagen no existe
+    res.status(404).send('Imagen no encontrada');
+  }
 });
 
 
