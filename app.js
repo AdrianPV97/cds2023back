@@ -52,7 +52,7 @@ app.get('/resumen', async (req,res) =>{
 app.get('/donacion', async (req, res)=>{
   try {
       const connection = await connectToDatabase();
-      const [rows, fields] = await connection.execute('SELECT tipo, grupo, id, evidencia, indice, voluntario FROM paquete');
+      const [rows, fields] = await connection.execute('CALL getDonacion()');
       res.json(rows);
       await connection.end();
     } catch (error) {
@@ -77,7 +77,7 @@ app.get('/ninos', async (req, res) =>{
   try {
       const connection = await connectToDatabase();
       const [rows, fields] = await connection.execute('CALL getUsers()');
-      res.json(rows[0]);
+      res.json(rows);
       await connection.end();
     } catch (error) {
       console.error('Error en el ejemplo de uso:', error);

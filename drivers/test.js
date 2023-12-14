@@ -17,7 +17,7 @@ const dbConfig = {
   async function connectToDatabase() {
     try {
       const connection = await mysql.createConnection(dbConfig);
-      console.log('Conexión a la base de datos establecida');
+     // console.log('Conexión a la base de datos establecida');
       
       // Manejar eventos de cierre de conexión inesperado
       connection.on('error', (err) => {
