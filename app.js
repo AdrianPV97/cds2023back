@@ -7,35 +7,23 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors'); // Importa el middleware cors
 const port = 4000;
-//const dbConection = require('./drivers/bdd');
 const { connectToDatabase } = require('./drivers/test');
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-
-const storage = multer.memoryStorage(); // Almacenar archivos en memoria
+const storage = multer.memoryStorage(); 
 const upload = multer({storage:storage});
-
-
-
 
 
 app.use(bodyParser.json());
 
 
-
-
-/*Funciones */
-
 function obtenerNinoPorId(ninos, id) {
   const ninoEncontrado = ninos.find(nino => nino.id === id);
-  return ninoEncontrado || null; // Devuelve el objeto encontrado o null si no se encuentra
+  return ninoEncontrado || null; 
 }
 
-
-
-/* GET*/
 
 app.get('/resumen', async (req,res) =>{
     try {
@@ -44,7 +32,7 @@ app.get('/resumen', async (req,res) =>{
         res.json(rows);
         await connection.end();
       } catch (error) {
-        console.error('Error en el ejemplo de uso:', error);
+        console.error('Error:', error);
       }
 });
 
@@ -56,7 +44,7 @@ app.get('/donacion', async (req, res)=>{
       res.json(rows);
       await connection.end();
     } catch (error) {
-      console.error('Error en el ejemplo de uso:', error);
+      console.error('Error:', error);
     }
 });
 
@@ -65,11 +53,10 @@ app.get('/donacion/:id',  async (req, res) =>{
       const id = req.params.id;
       const connection = await connectToDatabase();
       const [rows, fields] = await connection.execute(`SELECT * FROM paquete WHERE id = ${id}`);
-      console.log('Resultado del query:', rows);
       res.json(rows[0]);
       await connection.end();
     } catch (error) {
-      console.error('Error en el ejemplo de uso:', error);
+      console.error('Error:', error);
     }
 });
 
@@ -80,7 +67,7 @@ app.get('/ninos', async (req, res) =>{
       res.json(rows);
       await connection.end();
     } catch (error) {
-      console.error('Error en el ejemplo de uso:', error);
+      console.error('Error:', error);
     }
 });
 
@@ -92,7 +79,7 @@ app.get('/ninos/:id', async (req, res) =>{
       res.json(rows[0]);
       await connection.end();
     } catch (error) {
-      console.error('Error en el ejemplo de uso:', error);
+      console.error('Error:', error);
     }
 
 });
@@ -104,30 +91,25 @@ app.get('/paqueteid', async (req, res) =>{
       res.json(rows[0]);
       await connection.end();
     } catch (error) {
-      console.error('Error en el ejemplo de uso:', error);
+      console.error('Error:', error);
     }
 
 });
 
 app.get('/image/:name', (req, res) =>{
   const nombreArchivo = req.params.name;
-  //const nombreArchivo = '';
   const rutaImagen = path.join(__dirname, 'uploads', nombreArchivo);
 
   if (fs.existsSync(rutaImagen)) {
     res.sendFile(rutaImagen);
   } else {
-    // Manejar caso donde la imagen no existe
     res.status(404).send('Imagen no encontrada');
   }
 });
 
 
-/*POST */
 app.post('/login', (req, res) =>{
-    
     res.sendStatus(200);
-    //console.log(req.body)
 });
 
 app.post('/', (req, res) =>{
@@ -137,16 +119,12 @@ app.post('/', (req, res) =>{
               console.error('Error al realizar la consulta: ', err);
               return;
             }
-            
-            console.log('Resultados: ', rows);
     });
     res.sendStatus(200);
-    //console.log(req.body)
 });
 
 app.post('/registropaquete', async (req, res) => {
     try {
-        // Conectarse a la base de datos
         const connection = await connectToDatabase();
         
         const unique = new Date().getTime();
@@ -156,17 +134,12 @@ app.post('/registropaquete', async (req, res) => {
 
         const values = [unique, tipo, generoEdad, evidencia];
         
-        // Ejecutar el query SELECT NOW()
         const [rows, fields] = await connection.execute('CALL regPaquete(?,?,?,?)', values);
     
-        // Imprimir el resultado
-        //console.log('Resultado del query:', rows);
         res.sendStatus(200);
-    
-        // No olvides cerrar la conexión cuando hayas terminado
         await connection.end();
       } catch (error) {
-        console.error('Error en el ejemplo de uso:', error);
+        console.error('Error:', error);
       }
 });
 
@@ -185,7 +158,6 @@ app.post('/donacion',  (req, res) =>{
               console.error('Error al guardar la imagen:', err);
               res.status(500).send('Error interno del servidor.');
             } else {
-              //console.log('Imagen guardada exitosamente:', info);
               res.status(200).send(`${fileName}`);
             }
           });
